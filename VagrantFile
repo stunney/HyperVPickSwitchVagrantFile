@@ -1,0 +1,20 @@
+Vagrant.configure("2") do |config|
+
+#ENV.fetch('VAR_NAME', 'DefaultIfNotExist')
+#Example: 
+#{ENV.fetch('VAGRANT_HYPERV_NEWVM_SWITCH_NAME', 'Default Switch')}
+#{ENV.fetch('VAGRANT_HYPERV_NEWVM_SWITCH_NETWORK', 'private_network')}
+
+  config.vm.define "control" do |control|
+    control.vm.box = "centos/7"
+    
+    config.vm.network "#{ENV.fetch('VAGRANT_HYPERV_NEWVM_SWITCH_NETWORK', 'public_network')}", bridge: "#{ENV.fetch('VAGRANT_HYPERV_NEWVM_SWITCH_NAME', 'Extern1')}", :mac => "00155d01f23e"
+    control.vm.provider "hyperv" do |machine|
+      machine.vmname = "centos7-myapp-staging"
+      machine.memory = "2048"
+      machine.cpus = "2"
+    end
+
+    control.vm.synced_folder "./", "/home/vagrant/myapp", type: "rsync", rsync__exclude: ".git/"
+  end
+end
